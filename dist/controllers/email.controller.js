@@ -26,7 +26,6 @@ const sendMail = async (req, res) => {
         const id = req.user?.id;
         const { name, to, subject, message } = req.body;
         const file = req.file;
-        console.log(req.body);
         // Validate input
         if (!to || !Array.isArray(to) || to.length === 0) {
             res.status(400).json({ message: "Recipient emails are required and should be an array." });
@@ -42,8 +41,8 @@ const sendMail = async (req, res) => {
             return;
         }
         const mailInfo = await mailer_model_1.default.findOne({ where: { userId: id } });
-        const email = mailInfo?.mailUser || process.env.MAIL_USERNAME;
-        const pass = mailInfo?.mailPass || process.env.MAIL_PASSWORD;
+        const email = mailInfo !== null ? mailInfo?.mailUser : `${process.env.MAIL_USERNAME}`;
+        const pass = mailInfo !== null ? mailInfo?.mailPass : `${process.env.MAIL_PASSWORD}`;
         res.status(200).json({ message: "Email sent successfully." });
         await (0, mailer_1.sendMailWithAttachment)(name, email, pass, to, subject, message, filePath);
         if (filePath) {
@@ -58,7 +57,7 @@ const sendMail = async (req, res) => {
         }
     }
     catch (err) {
-        console.error(err);
+        console.error(err.message);
         res.status(500).json({ message: "Failed to send email." });
         return;
     }

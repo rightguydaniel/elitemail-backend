@@ -25,7 +25,6 @@ export const sendMail = async (req: Request, res: Response) => {
     const id = req.user?.id;
     const { name, to, subject, message } = req.body;
     const file = req.file;
-    console.log(req.body)
 
     // Validate input
     if (!to || !Array.isArray(to) || to.length === 0) {
@@ -45,8 +44,8 @@ export const sendMail = async (req: Request, res: Response) => {
     }
 
     const mailInfo = await Mailer.findOne({ where: { userId: id } });
-    const email = mailInfo?.mailUser || process.env.MAIL_USERNAME;
-    const pass = mailInfo?.mailPass || process.env.MAIL_PASSWORD;
+    const email = mailInfo !==null ? mailInfo?.mailUser : `${process.env.MAIL_USERNAME}`;
+    const pass = mailInfo !== null ? mailInfo?.mailPass : `${process.env.MAIL_PASSWORD}`;
 
     res.status(200).json({ message: "Email sent successfully." });
     await sendMailWithAttachment(name, email, pass, to, subject, message, filePath);
@@ -60,8 +59,8 @@ export const sendMail = async (req: Request, res: Response) => {
       });
     }
 
-  } catch (err) {
-    console.error(err);
+  } catch (err:any) {
+    console.error(err.message);
     res.status(500).json({ message: "Failed to send email." });
     return;
   }
