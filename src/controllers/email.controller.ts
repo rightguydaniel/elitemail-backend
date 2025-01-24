@@ -4,6 +4,9 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import Mailer from "../models/mailer.model";
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 // Multer configuration for file uploads
 const storage = multer.diskStorage({
@@ -42,11 +45,20 @@ export const sendMail = async (req: Request, res: Response) => {
     }
 
     const mailInfo = await Mailer.findOne({ where: { userId: id } });
-    const email = mailInfo?.mailUser;
-    const pass = mailInfo?.mailPass;
+    const email = mailInfo?.mailUser || process.env.MAIL_USERNAME;
+    const pass = mailInfo?.mailPass || process.env.MAIL_PASSWORD;
 
     res.status(200).json({ message: "Email sent successfully." });
     await sendMailWithAttachment(name, email, pass, to, subject, message, filePath);
+    if (filePath) {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        } else {
+          console.log("Uploaded file deleted successfully.");
+        }
+      });
+    }
 
   } catch (err) {
     console.error(err);
