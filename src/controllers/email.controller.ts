@@ -4,9 +4,10 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import Mailer from "../models/mailer.model";
-import dotenv from 'dotenv'
+import dotenv from "dotenv";
+import Users from "../models/users.model";
 
-dotenv.config()
+dotenv.config();
 
 // Multer configuration for file uploads
 const storage = multer.diskStorage({
@@ -26,9 +27,38 @@ export const sendMail = async (req: Request, res: Response) => {
     const { name, to, subject, message } = req.body;
     const file = req.file;
 
+    //check if user has units or is subscribed
+    const user = await Users.findOne({ where: { id } });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    if (
+      (!user.units || user.units <= 0) &&
+      (!user.subEndDate || new Date(user.subEndDate) < new Date())
+    ) {
+      res
+        .status(400)
+        .json({ message: "You have no active subscriptions or message units" });
+      return;
+    }
+
+    if (to.length > user?.units && user?.subEndDate === null) {
+      res
+        .status(400)
+        .json({ message: `You can only send to ${user?.units} mails` });
+      return;
+    }
+
     // Validate input
     if (!to || !Array.isArray(to) || to.length === 0) {
-      res.status(400).json({ message: "Recipient emails are required and should be an array." });
+      res
+        .status(400)
+        .json({
+          message: "Recipient emails are required and should be an array.",
+        });
       return;
     }
     if (!subject || !message) {
@@ -44,11 +74,19 @@ export const sendMail = async (req: Request, res: Response) => {
     }
 
     const mailInfo = await Mailer.findOne({ where: { userId: id } });
-    const email = mailInfo !==null ? mailInfo?.mailUser : `${process.env.MAIL_USERNAME}`;
-    const pass = mailInfo !== null ? mailInfo?.mailPass : `${process.env.MAIL_PASSWORD}`;
+    const email = mailInfo?.mailUser
+    const pass = mailInfo?.mailPass 
 
     res.status(200).json({ message: "Email sent successfully." });
-    await sendMailWithAttachment(name, email, pass, to, subject, message, filePath);
+    await sendMailWithAttachment(
+      name,
+      email,
+      pass,
+      to,
+      subject,
+      message,
+      filePath
+    );
     if (filePath) {
       fs.unlink(filePath, (err) => {
         if (err) {
@@ -58,8 +96,7 @@ export const sendMail = async (req: Request, res: Response) => {
         }
       });
     }
-
-  } catch (err:any) {
+  } catch (err: any) {
     console.error(err.message);
     res.status(500).json({ message: "Failed to send email." });
     return;

@@ -1,9 +1,8 @@
 import { Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
-import Mail from "nodemailer/lib/mailer";
 import Mailer from "../models/mailer.model";
 import { v4 } from "uuid";
-import User from "../models/users.model";
+import Users from "../models/users.model";
 
 export const addMailConfig = async (req: JwtPayload, res: Response) => {
   const { id } = req.params;
@@ -22,7 +21,7 @@ export const addMailConfig = async (req: JwtPayload, res: Response) => {
       return;
     }
     if (email) {
-      const user = await User.findOne({ where: { email } });
+      const user = await Users.findOne({ where: { email } });
       const addByEmail = await Mailer.create({
         id: v4(),
         userId: user?.id,

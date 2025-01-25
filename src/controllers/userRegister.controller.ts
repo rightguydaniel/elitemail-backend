@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import User from "../models/users.model";
+import Users from "../models/users.model";
 import bcrypt from "bcrypt";
 import { v4 } from "uuid";
 import jwt from "jsonwebtoken";
@@ -14,7 +14,7 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { userName, mailName, email, password } = req.body;
 
-    const existingUser = await User.findOne({ where: { email } });
+    const existingUser = await Users.findOne({ where: { email } });
     if (existingUser) {
       console.log("Email already exists")
       res.status(400).json({ message: "Email already exists" });
@@ -22,7 +22,7 @@ export const register = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({
+    const user = await Users.create({
       id: v4(),
       userName,
       mailName,

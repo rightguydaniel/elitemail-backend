@@ -7,7 +7,12 @@ export enum role {
   COMPANY = "Company",
 }
 
-export interface UserAttributes {
+export enum sub {
+  MONTHLY = "Monthly",
+  PAYG = "PayG",
+}
+
+export interface UsersAttributes {
   id: string;
   userName: string;
   mailName: string;
@@ -15,12 +20,16 @@ export interface UserAttributes {
   password: string;
   role: string;
   isVerified: boolean;
+  subStartDate?: Date;
+  subEndDate?: Date;
+  subType?: string;
+  units?: number;
 }
 
-export class User extends Model<UserAttributes> {
+export class Users extends Model<UsersAttributes> {
   [x: string]: any;
 }
-User.init(
+Users.init(
   {
     id: {
       type: DataTypes.UUID,
@@ -51,12 +60,31 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    subStartDate: {
+      type: DataTypes.DATE,
+      defaultValue: null,
+      allowNull: true,
+    },
+    subEndDate: {
+      type: DataTypes.DATE,
+      defaultValue: null,
+      allowNull: true,
+    },
+    subType: {
+      type: DataTypes.ENUM(...Object.values(sub)),
+      allowNull: false,
+    },
+    units: {
+      type: DataTypes.INTEGER,
+      defaultValue: null,
+      allowNull: true,
+    },
   },
   {
     sequelize: database,
     tableName: "Users",
-    timestamps: true
+    timestamps: true,
   }
 );
 
-export default User;
+export default Users;

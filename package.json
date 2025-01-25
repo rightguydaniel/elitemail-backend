@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "compile": "tsc -w",
-    "start": "nodemon dist/app.js"
+    "start": "nodemon dist/app.js",
+    "migration": "npx sequelize-cli db:migrate --config dist/config/database/migration.js"
   },
   "keywords": [
     "mail",
@@ -16,6 +17,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",

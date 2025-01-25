@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = exports.role = void 0;
+exports.Users = exports.sub = exports.role = void 0;
 const sequelize_1 = require("sequelize");
 const database_1 = require("../config/database/database");
 var role;
@@ -9,10 +9,15 @@ var role;
     role["USER"] = "User";
     role["COMPANY"] = "Company";
 })(role || (exports.role = role = {}));
-class User extends sequelize_1.Model {
+var sub;
+(function (sub) {
+    sub["MONTHLY"] = "Monthly";
+    sub["PAYG"] = "PayG";
+})(sub || (exports.sub = sub = {}));
+class Users extends sequelize_1.Model {
 }
-exports.User = User;
-User.init({
+exports.Users = Users;
+Users.init({
     id: {
         type: sequelize_1.DataTypes.UUID,
         primaryKey: true,
@@ -42,9 +47,28 @@ User.init({
         type: sequelize_1.DataTypes.BOOLEAN,
         defaultValue: false,
     },
+    subStartDate: {
+        type: sequelize_1.DataTypes.DATE,
+        defaultValue: null,
+        allowNull: true,
+    },
+    subEndDate: {
+        type: sequelize_1.DataTypes.DATE,
+        defaultValue: null,
+        allowNull: true,
+    },
+    subType: {
+        type: sequelize_1.DataTypes.ENUM(...Object.values(sub)),
+        allowNull: false,
+    },
+    units: {
+        type: sequelize_1.DataTypes.INTEGER,
+        defaultValue: null,
+        allowNull: true,
+    },
 }, {
     sequelize: database_1.database,
     tableName: "Users",
-    timestamps: true
+    timestamps: true,
 });
-exports.default = User;
+exports.default = Users;

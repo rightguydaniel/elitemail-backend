@@ -10,6 +10,7 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const mailer_model_1 = __importDefault(require("../models/mailer.model"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const users_model_1 = __importDefault(require("../models/users.model"));
 dotenv_1.default.config();
 // Multer configuration for file uploads
 const storage = multer_1.default.diskStorage({
@@ -26,9 +27,32 @@ const sendMail = async (req, res) => {
         const id = req.user?.id;
         const { name, to, subject, message } = req.body;
         const file = req.file;
+        //check if user has units or is subscribed
+        const user = await users_model_1.default.findOne({ where: { id } });
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        if ((!user.units || user.units <= 0) &&
+            (!user.subEndDate || new Date(user.subEndDate) < new Date())) {
+            res
+                .status(400)
+                .json({ message: "You have no active subscriptions or message units" });
+            return;
+        }
+        if (to.length > user?.units && user?.subEndDate === null) {
+            res
+                .status(400)
+                .json({ message: `You can only send to ${user?.units} mails` });
+            return;
+        }
         // Validate input
         if (!to || !Array.isArray(to) || to.length === 0) {
-            res.status(400).json({ message: "Recipient emails are required and should be an array." });
+            res
+                .status(400)
+                .json({
+                message: "Recipient emails are required and should be an array.",
+            });
             return;
         }
         if (!subject || !message) {
@@ -41,8 +65,8 @@ const sendMail = async (req, res) => {
             return;
         }
         const mailInfo = await mailer_model_1.default.findOne({ where: { userId: id } });
-        const email = mailInfo !== null ? mailInfo?.mailUser : `${process.env.MAIL_USERNAME}`;
-        const pass = mailInfo !== null ? mailInfo?.mailPass : `${process.env.MAIL_PASSWORD}`;
+        const email = mailInfo?.mailUser;
+        const pass = mailInfo?.mailPass;
         res.status(200).json({ message: "Email sent successfully." });
         await (0, mailer_1.sendMailWithAttachment)(name, email, pass, to, subject, message, filePath);
         if (filePath) {

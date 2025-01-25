@@ -27,7 +27,11 @@ const login = async (req, res) => {
         const token = jsonwebtoken_1.default.sign({ id: user.id }, `${process.env.APP_SECRET}`, {
             expiresIn: "1h",
         });
-        res.status(200).json({ token });
+        const sessionExpiry = new Date(new Date());
+        sessionExpiry.setHours(sessionExpiry.getHours() + 1);
+        res
+            .status(200)
+            .json({ token, sessionExpiry, subStartDate: user?.subStartDate });
     }
     catch (err) {
         res.status(500).json({ message: "Server error" });

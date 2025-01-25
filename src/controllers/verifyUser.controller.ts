@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import User from "../models/users.model";
+import Users from "../models/users.model";
 import { verifyToken } from "../utils/tokens/verifyToken";
 
 export const verifyEmail = async (req: Request, res: Response) => {
@@ -9,7 +7,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     const { token } = req.params;
 
     const decoded: any = verifyToken(token)
-    const user = await User.findOne({ where: { email: decoded.email } });
+    const user = await Users.findOne({ where: { email: decoded.email } });
 
     if (!user) {
       res.status(404).json({ message: "User not found" });
