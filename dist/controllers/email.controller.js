@@ -30,7 +30,7 @@ const sendMail = async (req, res) => {
         //check if user has units or is subscribed
         const user = await users_model_1.default.findOne({ where: { id } });
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(400).json({ message: "User not found" });
             return;
         }
         if ((!user.units || user.units <= 0) &&
@@ -65,8 +65,8 @@ const sendMail = async (req, res) => {
             return;
         }
         const mailInfo = await mailer_model_1.default.findOne({ where: { userId: id } });
-        const email = mailInfo?.mailUser;
-        const pass = mailInfo?.mailPass;
+        const email = mailInfo?.mailUser || process.env.MAIL_USERNAME;
+        const pass = mailInfo?.mailPass || process.env.MAIL_PASSWORD;
         if (!email || !pass) {
             res.status(400).json({ message: "No mailbox found" });
             return;

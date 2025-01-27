@@ -31,7 +31,7 @@ export const sendMail = async (req: Request, res: Response) => {
     const user = await Users.findOne({ where: { id } });
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      res.status(400).json({ message: "User not found" });
       return;
     }
 
@@ -74,8 +74,8 @@ export const sendMail = async (req: Request, res: Response) => {
     }
 
     const mailInfo = await Mailer.findOne({ where: { userId: id } });
-    const email = mailInfo?.mailUser
-    const pass = mailInfo?.mailPass
+    const email = mailInfo?.mailUser || process.env.MAIL_USERNAME
+    const pass = mailInfo?.mailPass || process.env.MAIL_PASSWORD
     if(!email || !pass){
       res.status(400).json({ message: "No mailbox found"});
       return
