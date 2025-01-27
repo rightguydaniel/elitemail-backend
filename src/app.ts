@@ -7,6 +7,11 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 const app = express();
+// const corsOptions = {
+//   origin: `${process.env.APP_URL}`, // Your frontend URL
+//   methods: 'GET,POST,PUT,DELETE', // Allowed methods
+//   allowedHeaders: 'Content-Type,Authorization', // Allowed headers
+// };
 app.use(cors());
 app.use(express.json());
 app.use(logger("dev"));
