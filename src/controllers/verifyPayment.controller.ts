@@ -29,7 +29,7 @@ export const verifyPayment = async (req: JwtPayload, res: Response) => {
       } else {
         user.subStartDate = payment.data.paid_at;
         user.subType = sub.PAYG;
-        user.units = payment.data.data.amount / 1000;
+        user.units += (payment.data.data.amount / 1000);
         user.subEndDate = null;
       }
       await user.save();

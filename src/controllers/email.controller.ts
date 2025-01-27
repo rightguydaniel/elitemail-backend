@@ -75,7 +75,13 @@ export const sendMail = async (req: Request, res: Response) => {
 
     const mailInfo = await Mailer.findOne({ where: { userId: id } });
     const email = mailInfo?.mailUser
-    const pass = mailInfo?.mailPass 
+    const pass = mailInfo?.mailPass
+    if(!email || !pass){
+      res.status(400).json({ message: "No mailbox found"});
+      return
+    }
+
+    console.log(email, pass)
 
     res.status(200).json({ message: "Email sent successfully." });
     await sendMailWithAttachment(
