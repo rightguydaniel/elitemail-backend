@@ -35,22 +35,22 @@ export const sendMail = async (req: Request, res: Response) => {
       return;
     }
 
-    if (
-      (!user.units || user.units <= 0) &&
-      (!user.subEndDate || new Date(user.subEndDate) < new Date())
-    ) {
-      res
-        .status(400)
-        .json({ message: "You have no active subscriptions or message units" });
-      return;
-    }
+    // if (
+    //   (!user.units || user.units <= 0) &&
+    //   (!user.subEndDate || new Date(user.subEndDate) < new Date())
+    // ) {
+    //   res
+    //     .status(400)
+    //     .json({ message: "You have no active subscriptions or message units" });
+    //   return;
+    // }
 
-    if (to.length > user?.units && user?.subEndDate === null) {
-      res
-        .status(400)
-        .json({ message: `You can only send to ${user?.units} mails` });
-      return;
-    }
+    // if (to.length > user?.units && user?.subEndDate === null) {
+    //   res
+    //     .status(400)
+    //     .json({ message: `You can only send to ${user?.units} mails` });
+    //   return;
+    // }
 
     // Validate input
     if (!to || !Array.isArray(to) || to.length === 0) {

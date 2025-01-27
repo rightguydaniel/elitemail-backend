@@ -33,19 +33,21 @@ const sendMail = async (req, res) => {
             res.status(400).json({ message: "User not found" });
             return;
         }
-        if ((!user.units || user.units <= 0) &&
-            (!user.subEndDate || new Date(user.subEndDate) < new Date())) {
-            res
-                .status(400)
-                .json({ message: "You have no active subscriptions or message units" });
-            return;
-        }
-        if (to.length > user?.units && user?.subEndDate === null) {
-            res
-                .status(400)
-                .json({ message: `You can only send to ${user?.units} mails` });
-            return;
-        }
+        // if (
+        //   (!user.units || user.units <= 0) &&
+        //   (!user.subEndDate || new Date(user.subEndDate) < new Date())
+        // ) {
+        //   res
+        //     .status(400)
+        //     .json({ message: "You have no active subscriptions or message units" });
+        //   return;
+        // }
+        // if (to.length > user?.units && user?.subEndDate === null) {
+        //   res
+        //     .status(400)
+        //     .json({ message: `You can only send to ${user?.units} mails` });
+        //   return;
+        // }
         // Validate input
         if (!to || !Array.isArray(to) || to.length === 0) {
             res
